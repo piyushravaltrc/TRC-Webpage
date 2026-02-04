@@ -1,5 +1,11 @@
 import os
-from flask import Flask, render_template, request, send_file, after_this_request
+from flask import (
+    Flask,
+    render_template,
+    request,
+    send_file,
+    after_this_request,
+)
 
 # -------------------- IMPORT BUSINESS LOGIC --------------------
 from scripts.tds_web import process_tds                 # TDS2
@@ -17,7 +23,10 @@ app = Flask(__name__)
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# -------------------- HELPER: AUTO DELETE FILE AFTER DOWNLOAD --------------------
+# -------------------- HELPERS --------------------
+def is_file_path(value):
+    return isinstance(value, str) and os.path.exists(value)
+
 def send_and_cleanup(file_path):
     @after_this_request
     def cleanup(response):
@@ -43,20 +52,25 @@ def index():
 @app.route("/tds1", methods=["GET", "POST"])
 def tds1():
     if request.method == "POST":
-        file1 = request.files.get("zfi071")
-        file2 = request.files.get("zfitdsrep")
+        f1 = request.files.get("zfi071")
+        f2 = request.files.get("zfitdsrep")
 
-        if not file1 or not file2:
+        if not f1 or not f2:
             return render_template("tds1.html", error="⚠️ Please upload both files.")
 
-        file1_path = os.path.join(UPLOAD_FOLDER, file1.filename)
-        file2_path = os.path.join(UPLOAD_FOLDER, file2.filename)
-        file1.save(file1_path)
-        file2.save(file2_path)
+        p1 = os.path.join(UPLOAD_FOLDER, f1.filename)
+        p2 = os.path.join(UPLOAD_FOLDER, f2.filename)
+        f1.save(p1)
+        f2.save(p2)
 
         try:
-            output_file = process_tds1(file1_path, file2_path, UPLOAD_FOLDER)
-            return send_and_cleanup(output_file)
+            result = process_tds1(p1, p2, UPLOAD_FOLDER)
+
+            if is_file_path(result):
+                return send_and_cleanup(result)
+
+            return render_template("result.html", message=result, success=True)
+
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -66,20 +80,25 @@ def tds1():
 @app.route("/tds2", methods=["GET", "POST"])
 def tds2():
     if request.method == "POST":
-        file1 = request.files.get("zfi071")
-        file2 = request.files.get("zfitdsrep")
+        f1 = request.files.get("zfi071")
+        f2 = request.files.get("zfitdsrep")
 
-        if not file1 or not file2:
+        if not f1 or not f2:
             return render_template("tds2.html", error="⚠️ Please upload both files.")
 
-        file1_path = os.path.join(UPLOAD_FOLDER, file1.filename)
-        file2_path = os.path.join(UPLOAD_FOLDER, file2.filename)
-        file1.save(file1_path)
-        file2.save(file2_path)
+        p1 = os.path.join(UPLOAD_FOLDER, f1.filename)
+        p2 = os.path.join(UPLOAD_FOLDER, f2.filename)
+        f1.save(p1)
+        f2.save(p2)
 
         try:
-            output_file = process_tds(file1_path, file2_path, UPLOAD_FOLDER)
-            return send_and_cleanup(output_file)
+            result = process_tds(p1, p2, UPLOAD_FOLDER)
+
+            if is_file_path(result):
+                return send_and_cleanup(result)
+
+            return render_template("result.html", message=result, success=True)
+
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -89,26 +108,31 @@ def tds2():
 @app.route("/tds3", methods=["GET", "POST"])
 def tds3():
     if request.method == "POST":
-        file1 = request.files.get("zfi071")
-        file2 = request.files.get("zfitdsrep")
+        f1 = request.files.get("zfi071")
+        f2 = request.files.get("zfitdsrep")
 
-        if not file1 or not file2:
+        if not f1 or not f2:
             return render_template("tds3.html", error="⚠️ Please upload both files.")
 
-        file1_path = os.path.join(UPLOAD_FOLDER, file1.filename)
-        file2_path = os.path.join(UPLOAD_FOLDER, file2.filename)
-        file1.save(file1_path)
-        file2.save(file2_path)
+        p1 = os.path.join(UPLOAD_FOLDER, f1.filename)
+        p2 = os.path.join(UPLOAD_FOLDER, f2.filename)
+        f1.save(p1)
+        f2.save(p2)
 
         try:
-            output_file = process_tds3(file1_path, file2_path)
-            return send_and_cleanup(output_file)
+            result = process_tds3(p1, p2)
+
+            if is_file_path(result):
+                return send_and_cleanup(result)
+
+            return render_template("result.html", message=result, success=True)
+
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
     return render_template("tds3.html")
 
-# -------------------- DUPLICATE FINDER --------------------
+# -------------------- DUPLICATE --------------------
 @app.route("/duplicate", methods=["GET", "POST"])
 def duplicate():
     if request.method == "POST":
@@ -117,12 +141,17 @@ def duplicate():
         if not file:
             return render_template("duplicate.html", error="⚠️ Please upload a file.")
 
-        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(file_path)
+        path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(path)
 
         try:
-            output_file = process_duplicate(file_path, UPLOAD_FOLDER)
-            return send_and_cleanup(output_file)
+            result = process_duplicate(path, UPLOAD_FOLDER)
+
+            if is_file_path(result):
+                return send_and_cleanup(result)
+
+            return render_template("result.html", message=result, success=True)
+
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -132,20 +161,25 @@ def duplicate():
 @app.route("/nis", methods=["GET", "POST"])
 def nis():
     if request.method == "POST":
-        nis_file = request.files.get("nis_file")
-        audit_file = request.files.get("audit_file")
+        nfile = request.files.get("nis_file")
+        afile = request.files.get("audit_file")
 
-        if not nis_file or not audit_file:
+        if not nfile or not afile:
             return render_template("NIS.html", error="⚠️ Please upload both files.")
 
-        nis_path = os.path.join(UPLOAD_FOLDER, nis_file.filename)
-        audit_path = os.path.join(UPLOAD_FOLDER, audit_file.filename)
-        nis_file.save(nis_path)
-        audit_file.save(audit_path)
+        np = os.path.join(UPLOAD_FOLDER, nfile.filename)
+        ap = os.path.join(UPLOAD_FOLDER, afile.filename)
+        nfile.save(np)
+        afile.save(ap)
 
         try:
-            output_file = process_nis(nis_path, audit_path)
-            return send_and_cleanup(output_file)
+            result = process_nis(np, ap)
+
+            if is_file_path(result):
+                return send_and_cleanup(result)
+
+            return render_template("result.html", message=result, success=True)
+
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -155,24 +189,28 @@ def nis():
 @app.route("/retention", methods=["GET", "POST"])
 def retention():
     if request.method == "POST":
-        invoice = request.files.get("invoice")
-        vendor = request.files.get("vendor")
-        retention_file = request.files.get("retention")
+        inv = request.files.get("invoice")
+        ven = request.files.get("vendor")
+        ret = request.files.get("retention")
 
-        if not invoice or not vendor or not retention_file:
+        if not inv or not ven or not ret:
             return render_template("Retention.html", error="⚠️ Please upload all three files.")
 
-        invoice_path = os.path.join(UPLOAD_FOLDER, invoice.filename)
-        vendor_path = os.path.join(UPLOAD_FOLDER, vendor.filename)
-        retention_path = os.path.join(UPLOAD_FOLDER, retention_file.filename)
-
-        invoice.save(invoice_path)
-        vendor.save(vendor_path)
-        retention_file.save(retention_path)
+        ip = os.path.join(UPLOAD_FOLDER, inv.filename)
+        vp = os.path.join(UPLOAD_FOLDER, ven.filename)
+        rp = os.path.join(UPLOAD_FOLDER, ret.filename)
+        inv.save(ip)
+        ven.save(vp)
+        ret.save(rp)
 
         try:
-            output_file = process_retention(invoice_path, vendor_path, retention_path)
-            return send_and_cleanup(output_file)
+            result = process_retention(ip, vp, rp)
+
+            if is_file_path(result):
+                return send_and_cleanup(result)
+
+            return render_template("result.html", message=result, success=True)
+
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -192,21 +230,21 @@ def tds_dynamic():
                 success=False,
             )
 
-        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(file_path)
+        path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(path)
 
         try:
-            outputs = run_tds_rules(file_path, rules)
+            outputs = run_tds_rules(path, rules)
 
-            # If multiple files → download first one (or zip later)
-            if isinstance(outputs, list) and outputs:
+            if isinstance(outputs, list) and outputs and is_file_path(outputs[0]):
                 return send_and_cleanup(outputs[0])
 
             return render_template(
                 "tds_dynamic.html",
-                message="⚠️ No output file generated",
-                success=False,
+                message="✅ Process completed successfully",
+                success=True,
             )
+
         except Exception as e:
             return render_template(
                 "tds_dynamic.html",
@@ -216,7 +254,7 @@ def tds_dynamic():
 
     return render_template("tds_dynamic.html")
 
-# -------------------- GST ITC --------------------
+# -------------------- GST --------------------
 @app.route("/gst", methods=["GET", "POST"])
 def gst_itc():
     if request.method == "POST":
@@ -225,19 +263,19 @@ def gst_itc():
         if not file:
             return render_template("gst_itc.html", message="❌ Please upload an Excel file")
 
-        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(file_path)
+        path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(path)
 
-        success, result = process_gst(file_path)
+        success, result = process_gst(path)
 
-        if success:
+        if success and is_file_path(result):
             return send_and_cleanup(result)
 
-        return render_template("gst_itc.html", message=f"❌ Error: {result}")
+        return render_template("gst_itc.html", message=result)
 
     return render_template("gst_itc.html")
 
-# -------------------- RAILWAY ENTRY POINT --------------------
+# -------------------- ENTRY POINT --------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
