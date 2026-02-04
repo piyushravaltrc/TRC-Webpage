@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDS1 Script | TRC Automation Portal</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='CA logo.png') }}">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    :root {
+      --primary-blue: #002147;
+      --accent-blue: #004B8D;
+      --highlight-blue: #1A73E8;
+      --accent-green: #00A86B;
+      --text-dark: #1E1E1E;
+      --bg-light: #F4F7FB;
+      --card-bg: #FFFFFF;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(90deg, #002147, #004B8D);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    header img {
+      height: 55px;
+      margin-right: 15px;
+      border-radius: 6px;
+    }
+    header .logo-section {
+      display: flex;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .container {
+      display: flex;
+      flex: 1;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+    width: 280px;
+    background: var(--card-bg);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    padding: 25px 0;
+    overflow-y: auto;     /* AUTO SCROLL */
+    height: calc(100vh - 80px);  
+  }
+    .sidebar ul { list-style: none; margin:0; padding:0; }
+
+    .sidebar a,
+    .dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 13px;
+      line-height: 1.3;
+      font-weight: 600;
+      color: var(--text-dark);
+      border-left: 4px solid transparent;
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition: all .25s ease;
+    }
+
+    .sidebar a:hover,
+    .dropdown-btn:hover {
+      background-color: rgba(0, 33, 71, 0.15);
+      border-left-color: var(--highlight-blue);
+      color: var(--highlight-blue);
+    }
+
+    .dropdown-content {
+      display: none;
+      flex-direction: column;
+      padding-left: 20px;
+      font-size: 12px;
+    }
+
+    /* MAIN CONTENT CENTERED */
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 25px;
+    }
+
+    .form-box {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 25px 70px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .form-box h2 {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+      font-size: 15px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #f9fafc;
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+
+    button {
+      background-color: var(--accent-blue);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: var(--accent-green);
+      transform: scale(1.03);
+    }
+
+    .error { text-align: center; color: red; font-weight: 700; }
+    .success { text-align: center; color: green; font-weight: 700; }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo-section">
+    <img src="{{ url_for('static', filename='T R Chadha Logo.jpg') }}">
+    <h1><i class="fa-solid fa-robot"></i> Script Automation Portal</h1>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <ul>
+      <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
+
+      <li>
+        <button class="dropdown-btn"><i class="fa-solid fa-gears"></i> Automated Scripts ▾</button>
+
+        <div class="dropdown-content">
+          <button class="dropdown-btn"><i class="fa-solid fa-file-invoice-dollar"></i> TDS Scripts ▾</button>
+          <div class="dropdown-content">
+            <a href="/tds1"><i class="fa-solid fa-book"></i> Multiple rate in single PO</a>
+            <a href="/tds2"><i class="fa-solid fa-book"></i> 194C Deducted at lower rate</a>
+            <a href="/tds3"><i class="fa-solid fa-book"></i> 194J Deducted at lower rate</a>
+            <a href="/tds_dynamic"><i class="fa-solid fa-book"></i> TDS Overall limit</a>
+          </div>
+
+          <a href="/duplicate"><i class="fa-solid fa-clone"></i> Duplicate Invoice Booking</a>
+          <a href="/retention"><i class="fa-solid fa-briefcase"></i> Retention Not as per PO</a>
+        </div>
+      </li>
+
+      <li><a href="#"><i class="fa-solid fa-user"></i> User Profile</a></li>
+    </ul>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="form-box">
+      <h2><i class="fa-solid fa-book" style="color:#002147"></i> TDS1 - Multiple rate in single PO</h2>
+
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
+
+      <form action="/tds1" method="post" enctype="multipart/form-data">
+        <label>Upload Purchase Register:</label>
+        <input type="file" name="zfi071" required>
+
+        <label>Upload TDS Register:</label>
+        <input type="file" name="zfitdsrep" required>
+
+        <div style="text-align:center;">
+          <button type="submit"><i class="fa-solid fa-play"></i> Run Script</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".dropdown-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const content = btn.nextElementSibling;
+      if (content) {
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T R Chadha & Co LLP | Automation Portal</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='CA logo.png') }}">
+
+  <!-- Font Awesome Classic Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+  <style>
+    :root {
+      --primary-blue: #002147;
+      --accent-blue: #004B8D;
+      --accent-green: #00A86B;
+      --highlight-blue: #1A73E8;
+      --text-dark: #1E1E1E;
+      --bg-light: #F4F7FB;
+      --card-bg: #FFFFFF;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(90deg, #002147, #004B8D);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    header img {
+      height: 55px;
+      margin-right: 15px;
+      border-radius: 6px;
+    }
+
+    header .logo-section {
+      display: flex;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .script-count {
+      font-size: 16px;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .container {
+      display: flex;
+      flex: 1;
+    }
+
+    .sidebar {
+    width: 280px;
+    background: var(--card-bg);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    padding: 25px 0;
+    overflow-y: auto;     /* AUTO SCROLL */
+    height: calc(100vh - 80px);  
+  }
+
+    .sidebar ul {
+      padding: 0;
+      list-style: none;
+    }
+
+    .sidebar a,
+    .dropdown-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 20px;
+      text-decoration: none;
+      color: var(--text-dark);
+      border-left: 4px solid transparent;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition: all .25s ease;
+    }
+
+    .dropdown-content a,
+    .dropdown-content .dropdown-btn,
+    .dropdown-content .script-item a {
+      font-size: 12px !important;
+    }
+
+    .dropdown-btn:hover,
+    .sidebar a:hover {
+      background-color: rgba(0, 33, 71, 0.15);
+      border-left-color: var(--highlight-blue);
+      color: var(--highlight-blue);
+    }
+
+    .dropdown-content {
+      display: none;
+      flex-direction: column;
+      padding-left: 20px;
+    }
+
+    .script-item a {
+      white-space: nowrap !important;
+      overflow: visible !important;
+      text-overflow: unset !important;
+      display: inline-block !important;
+      width: auto;
+    }
+
+    .script-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-right: 15px;
+    }
+
+    .info-circle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 18px;
+      height: 18px;
+      background: #002147;
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .info-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      padding: 0;
+    }
+
+    .tooltip-box {
+      display: none;
+      position: absolute;
+      left: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #002147;
+      color: white;
+      padding: 8px 12px;
+      width: 220px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      z-index: 9999;
+      white-space: normal;
+    }
+
+    .tooltip-box::after {
+      content: "";
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-width: 8px;
+      border-style: solid;
+      border-color: transparent #002147 transparent transparent;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: var(--card-bg);
+      font-size: 14px;
+      color: #555;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-section">
+      <img src="{{ url_for('static', filename='T R Chadha Logo.jpg') }}" alt="Logo">
+      <h1><i class="fa-solid fa-robot"></i> Script Automation Portal</h1>
+    </div>
+    <div class="script-count" id="script-count">Total Scripts: 0</div>
+  </header>
+
+  <div class="container">
+
+    <nav class="sidebar">
+      <ul>
+        <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
+
+        <li>
+          <button class="dropdown-btn"><i class="fa-solid fa-gears"></i> Automated Scripts ▾</button>
+
+          <div class="dropdown-content">
+
+            <!-- TDS Section -->
+            <button class="dropdown-btn"><i class="fa-solid fa-file-invoice-dollar"></i> TDS Scripts ▾</button>
+            <div class="dropdown-content">
+
+              <div class="script-item">
+                <a href="/tds1"><i class="fa-solid fa-book"></i> Multiple rate in single PO</a>
+                <button class="info-btn" data-description="➤ This script finds multiple TDS rates Used in a single PO.<br><br>
+                          <b>Field required in Dump:</b><br>
+                          <b>➤ Purchase Register – Required Fields:</b><br>
+                              • Company Code<br>
+                              • Vendor<br>
+                              • Document No.<br>
+                              • PO No.<br>
+                              • Item Text<br><br>
+
+                              <b>➤ TDS Report – Required Fields:</b><br>
+                              • Company Code<br>
+                              • Vendor<br>
+                              • Document No.<br>
+                              • PO No.<br>
+                              • Item Text<br>
+                              • TDS Rate<br>
+                              • TDS Section<br>
+                              ">
+                  <span class="info-circle">i</span>
+                  <span class="tooltip-box"></span>
+                </button>
+              </div>
+
+              <div class="script-item">
+                <a href="/tds2"><i class="fa-solid fa-book"></i> 194C Deducted at lower rate</a>
+                <button class="info-btn" 
+                        data-description='
+                          ➤ Checks invoices where TDS @194C was deducted at a lower rate excluding Individual & HUF.<br><br>
+                          <b>Field required in Dump:</b><br>
+                          <b>➤ Purchase Register – Required Fields:</b><br>
+                                • Company Code<br>
+                                • Vendor<br>
+                                • Document No.<br>
+                                • PO No.<br>
+                                • Item Text<br><br>
+
+                                <b>➤ TDS Report – Required Fields:</b><br>
+                                • Company Code<br>
+                                • Vendor<br>
+                                • Document No.<br>
+                                • PO No.<br>
+                                • Item Text<br>
+                                • TDS Rate<br>
+                                • TDS Section<br>
+                                • Pan No<br>
+                                '>
+                  <span class="info-circle">i</span>
+                  <span class="tooltip-box"></span>
+                </button>
+              </div>
+
+              <div class="script-item">
+                <a href="/tds3"><i class="fa-solid fa-book"></i> 194J Deducted at lower rate</a>
+                <button class="info-btn" data-description="➤ Checks invoices where TDS @194J has been deducted at a lower rate.<br><br>
+                          <b>Field required in Dump:</b><br>
+                          <b>➤ Purchase Register – Required Fields:</b><br>
+                                • Company Code<br>
+                                • Vendor<br>
+                                • Document No.<br>
+                                • PO No.<br>
+                                • Item Text<br><br>
+
+                                <b>➤ TDS Report – Required Fields:</b><br>
+                                • Company Code<br>
+                                • Vendor<br>
+                                • Document No.<br>
+                                • PO No.<br>
+                                • Item Text<br>
+                                • TDS Rate<br>
+                                • TDS Section<br>
+                                • Pan No<br>">
+                  <span class="info-circle">i</span>
+                  <span class="tooltip-box"></span>
+                </button>
+              </div>
+              <div class="script-item">
+                <a href="/tds_dynamic"><i class="fa-solid fa-book"></i> TDS Overall limit</a>
+                <button class="info-btn" data-description="➤ C194C – Overall: Vendor-wise cumulative > ₹1,00,000 → Report <br>
+                  ➤ 194C – Individual: Document-wise > ₹30,000 → Report <br>
+                  ➤ 194H – Individual: Document-wise > ₹20,000 → Report<br>
+                  ➤ 194Q – Overall: Vendor-wise cumulative > ₹50,00,000 (ignore negatives) → Report <br>
+                  ➤ 194J – Individual: Document-wise > ₹50,000 → Report.<br><br>
+                          <b>Field required in Dump:</b><br>
+                          <b>➤ TDS Report – Required Fields:</b><br>
+                                • Vendor<br>
+                                • Document Number<br>
+                                • Total Taxable Value<br>
+                                • Posting Date<br>
+                                • Company Code<br>
+                                • PAN Card No<br>
+                                • TDS Section<br>
+                                • TDS Rate<br>">
+                  <span class="info-circle">i</span>
+                  <span class="tooltip-box"></span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Duplicate Invoice -->
+            <div class="script-item">
+              <a href="/duplicate"><i class="fa-solid fa-clone"></i> Duplicate Invoice Booking</a>
+              <button class="info-btn" data-description="➤ Identifies duplicate invoices of same Vendor accounted by Company .<br><br>
+                          <b>Field required in Dump:</b><br>
+                          • Document Type<br>
+                          • Vendor<br>
+                          • Amount in LC<br>
+                          • Reference<br>
+                          • Document No<br>">
+                <span class="info-circle">i</span>
+                <span class="tooltip-box"></span>
+              </button>
+            </div>
+
+            <!-- Retention -->
+            <div class="script-item">
+              <a href="/retention"><i class="fa-solid fa-briefcase"></i> Retention Not as per PO</a>
+              <button class="info-btn" data-description="➤ Identifies Mismatched in retention percentage as per invoice & PO dump.<br><b>Field required in Dump:</b><br>
+              <b>➤ Invoice Dump – Required Fields:</b><br>
+                        • Vendor Number<br>
+                        • Company Code<br>
+                        • Purchasing Document Number<br>
+                        • Accounting Document Number<br>
+                        • Value of Checklist<br>
+                        • Vendor Name<br>
+                        • Status of Checklist<br>
+                        • Accounting Document Type<br>
+                        • Reference Document Number<br>
+                        • Invoice Number<br>
+                        <b>➤ Vendor Ledger – Required Fields:</b><br>
+                        • Document Number<br>
+                        • Reference<br>
+                        • Document Type<br>
+                        • Amount in Local Currency<br>
+                        • Text<br>
+                        • Company Code<br>
+                        • Account Name<br>
+                        • Vendor<br>
+                        <b>➤ Retention Terms File – Required Fields:</b><br>
+                        • PO Number<br>
+                        • Retention %<br>
+                        ">
+                <span class="info-circle">i</span>
+                <span class="tooltip-box"></span>
+              </button>
+            </div>
+            <!-- div class="script-item">
+              <a href="/nis"><i class="fa-solid fa-clone"></i>NIS Data Processing</a>
+              <button class="info-btn" data-description="➤ Identifies duplicate invoices of same Vendor accounted by Company.<br><br>
+                          <b>Field required in Dump:</b><br>
+                          <b>➤ NIS Dump - Required Fields:</b><br>
+                          • Company Code<br>
+                          • Status<br>
+                          • Vendor / Employee Name<br>
+                          • Purpose of Expense<br>
+                          • Total Invoice Amount<br>
+                          <b>➤ Audit Universe: - Required Fields:</b><br>
+                          • Company Code<br>
+                          • Name of Company<br>
+                          ">
+                <span class="info-circle">i</span>
+                <span class="tooltip-box"></span>
+              </button>
+            </div>
+          </div>
+        </li> -->
+
+        <li><a href="#"><i class="fa-solid fa-user"></i> User Profile</a></li>
+
+      </ul>
+    </nav>
+
+    <main class="main-content">
+      <h2>👋 Welcome to TRC Automation Portal</h2>
+      <p>Manage and execute your automation scripts securely and efficiently.<br>
+        Choose a tool from the sidebar to get started.</p>
+
+      <lottie-player
+        src="https://assets3.lottiefiles.com/packages/lf20_kdx6cani.json"
+        background="transparent"
+        speed="1"
+        style="width: 300px; height: 300px;"
+        loop autoplay>
+      </lottie-player>
+    </main>
+  </div>
+
+  <!-- MODAL -->
+  <div id="doc-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+    <div style="background:white; padding:25px; border-radius:8px; max-width:500px; width:90%; position:relative;">
+      <span id="close-modal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;">×</span>
+      <h3>Script Documentation</h3>
+      <p id="doc-content" style="margin-top:15px; font-size:15px;"></p>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 T R Chadha & Co LLP | Designed for Automation Excellence
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+  // Dropdown expand/collapse
+  document.querySelectorAll(".dropdown-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const content = btn.nextElementSibling;
+      if (content) {
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      }
+    });
+  });
+
+  // Script Count
+  const total = document.querySelectorAll(".script-item").length;
+  document.getElementById("script-count").innerText = "Total Scripts: " + total;
+
+  // Tooltip and Modal Logic
+  const modal = document.getElementById("doc-modal");
+  const modalContent = document.getElementById("doc-content");
+  const closeModal = document.getElementById("close-modal");
+
+  document.querySelectorAll(".info-btn").forEach(btn => {
+    const tooltip = btn.querySelector(".tooltip-box");
+    const desc = btn.getAttribute("data-description");
+
+    // ❌ REMOVE HOVER EFFECT
+    // btn.addEventListener("mouseenter", ...)
+    // btn.addEventListener("mouseleave", ...)
+
+    // ✅ Click modal only
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      modalContent.innerHTML = desc;
+      modal.style.display = "flex";
+    });
+  });
+
+  closeModal.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  window.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+
+});
+
+</script>
+
+</body>
+</html>

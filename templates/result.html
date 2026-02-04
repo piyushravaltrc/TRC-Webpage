@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Result</title>
+    <style>
+        body {
+            background-color: #f5f6f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .result-container {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 700px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .result-container b {
+            color: #008c4a;
+            word-break: break-all;
+        }
+
+        .success {
+            color: #008c4a;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #d9534f;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        .buttons a {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 0 8px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .buttons a:hover {
+            background-color: #0056b3;
+        }
+
+        .emoji {
+            font-size: 28px;
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        {% if success %}
+            <div class="success">
+                <span class="emoji">✅✅</span> <br>
+                {{ message | safe }}
+            </div>
+        {% else %}
+            <div class="error">
+                <span class="emoji">❌</span> <br>
+                {{ message | safe }}
+            </div>
+        {% endif %}
+
+        <div class="buttons">
+            <a href="javascript:history.back()">⬅ Back</a>
+            <a href="/">🏠 Home</a>
+        </div>
+    </div>
+</body>
+</html>
