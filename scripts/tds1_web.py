@@ -44,19 +44,29 @@ def process_tds1(zfi071_file, zfitdsrep_file, output_folder=None):
         df_multiple_tds = filtered_df[filtered_df["PO No._x"].isin(po_multiple_tds)]
 
         # ✅ Save only one final output file (in Downloads)
-        downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
-        os.makedirs(downloads_folder, exist_ok=True)
+        # downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
+        # os.makedirs(downloads_folder, exist_ok=True)
+
+        # timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M")
+        # final_output = os.path.join(downloads_folder, f"Final_Output_TDS1_{timestamp}.xlsx")
+        os.makedirs(output_folder, exist_ok=True)
 
         timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M")
-        final_output = os.path.join(downloads_folder, f"Final_Output_TDS1_{timestamp}.xlsx")
+        final_output = os.path.join(
+            output_folder,
+            f"Final_Output_TDS1_{timestamp}.xlsx"
+        )
+
         df_multiple_tds.to_excel(final_output, index=False)
 
         # ✅ Return message for Flask
-        return (
-            f"✅ TDS1 Process Completed Successfully!<br>"
-            f"📁 File saved in your Downloads folder:<br>"
-            f"- <b>{os.path.basename(final_output)}</b>"
-        )
+        # return (
+        #     f"✅ TDS1 Process Completed Successfully!<br>"
+        #     f"📁 File saved in your Downloads folder:<br>"
+        #     f"- <b>{os.path.basename(final_output)}</b>"
+        # )
+        return final_output
 
     except Exception as e:
-        return f"❌ Error: {e}"
+        # return f"❌ Error: {e}"
+        raise Exception(e)

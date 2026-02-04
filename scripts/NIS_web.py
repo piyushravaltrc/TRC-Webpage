@@ -3,7 +3,8 @@ import re
 import os
 from datetime import datetime
 
-def process_nis(nis_path, audit_path):
+# def process_nis(nis_path, audit_path):
+def process_nis(nis_path, audit_path, output_folder):
     try:
         # Step 1: Load Excel files
         nis_dump = pd.read_excel(nis_path)
@@ -66,9 +67,11 @@ def process_nis(nis_path, audit_path):
         nis_dump = nis_dump[~nis_dump['Vendor / Employee Name'].isin(audit_universe['Name of Company'])]
 
         # Step 8: Save outputs to Downloads with timestamp
-        downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+        os.makedirs(output_folder, exist_ok=True)
+
         timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M")
-        output_path = os.path.join(downloads_path, f"NIS_Splitting_{timestamp}.xlsx")
+        output_path = os.path.join(output_folder, f"NIS_Splitting_{timestamp}.xlsx")
+
 
         with pd.ExcelWriter(output_path) as writer:
             expense_5000_df.to_excel(writer, sheet_name='Exceptions <= 5000', index=False)
@@ -79,7 +82,9 @@ def process_nis(nis_path, audit_path):
             specific_20000_df.to_excel(writer, sheet_name='Specific Keyword <= 20000', index=False)
             specific_keywords_rows_df.to_excel(writer, sheet_name='All Specific Keyword Rows', index=False)
 
-        return f"✅ Processing complete! File saved to Downloads folder:\n{output_path}"
-
+        # return f"✅ Processing complete! File saved to Downloads folder:\n{output_path}"
+        return output_path
+    
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        # return f"❌ Error: {str(e)}"
+        raise Exception(str(e))

@@ -31,7 +31,8 @@ EXCLUDE_VENDOR = [
 # ==============================
 # MAIN GST FUNCTION
 # ==============================
-def process_gst(file_path):
+# def process_gst(file_path):
+def process_gst(file_path, output_folder):
     try:
         df = pd.read_excel(file_path)
 
@@ -72,11 +73,12 @@ def process_gst(file_path):
             else:
                 others.append(row)
 
+        os.makedirs(output_folder, exist_ok=True)
         output_file = os.path.join(
-            os.path.expanduser("~"),
-            "Downloads",
+            output_folder,
             f"GST_ITC_Output_{datetime.now():%d-%m-%Y_%H-%M}.xlsx"
         )
+
 
         with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
             pd.DataFrame(ineligible).to_excel(writer, "Ineligible ITC Taken", index=False)
@@ -87,8 +89,10 @@ def process_gst(file_path):
 
         write_log(f"GST ITC processed: {output_file}")
 
-        return True, os.path.basename(output_file)
+        # return True, os.path.basename(output_file)
+        return output_file
 
     except Exception as e:
         write_log(f"Error: {e}")
-        return False, str(e)
+        # return False, str(e)
+        raise Exception(str(e))

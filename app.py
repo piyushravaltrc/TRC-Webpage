@@ -120,7 +120,7 @@ def tds3():
         f2.save(p2)
 
         try:
-            result = process_tds3(p1, p2)
+            result = process_tds3(p1, p2, UPLOAD_FOLDER)
 
             if is_file_path(result):
                 return send_and_cleanup(result)
@@ -173,7 +173,7 @@ def nis():
         afile.save(ap)
 
         try:
-            result = process_nis(np, ap)
+            result = process_nis(np, ap, UPLOAD_FOLDER)
 
             if is_file_path(result):
                 return send_and_cleanup(result)
@@ -204,7 +204,7 @@ def retention():
         ret.save(rp)
 
         try:
-            result = process_retention(ip, vp, rp)
+            result = process_retention(ip, vp, rp, UPLOAD_FOLDER)
 
             if is_file_path(result):
                 return send_and_cleanup(result)
@@ -234,10 +234,10 @@ def tds_dynamic():
         file.save(path)
 
         try:
-            outputs = run_tds_rules(path, rules)
+            result = run_tds_rules(path, rules, UPLOAD_FOLDER)
 
-            if isinstance(outputs, list) and outputs and is_file_path(outputs[0]):
-                return send_and_cleanup(outputs[0])
+            if is_file_path(result):
+                return send_and_cleanup(result)
 
             return render_template(
                 "tds_dynamic.html",
@@ -266,12 +266,16 @@ def gst_itc():
         path = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(path)
 
-        success, result = process_gst(path)
+        try:
+            result = process_gst(path, UPLOAD_FOLDER)
 
-        if success and is_file_path(result):
-            return send_and_cleanup(result)
+            if is_file_path(result):
+                return send_and_cleanup(result)
 
-        return render_template("gst_itc.html", message=result)
+            return render_template("gst_itc.html", message="✅ GST processing completed")
+
+        except Exception as e:
+            return render_template("gst_itc.html", message=f"❌ Error: {e}")
 
     return render_template("gst_itc.html")
 
