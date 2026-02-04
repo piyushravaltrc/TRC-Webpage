@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file, after_this_request
 
 # -------------------- IMPORT BUSINESS LOGIC --------------------
 from scripts.tds_web import process_tds                 # TDS2
@@ -14,9 +14,25 @@ from scripts.gst_logic import process_gst                # GST ITC
 # -------------------- APP SETUP --------------------
 app = Flask(__name__)
 
-# Upload directory
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# -------------------- HELPER: AUTO DELETE FILE AFTER DOWNLOAD --------------------
+def send_and_cleanup(file_path):
+    @after_this_request
+    def cleanup(response):
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception:
+            pass
+        return response
+
+    return send_file(
+        file_path,
+        as_attachment=True,
+        download_name=os.path.basename(file_path),
+    )
 
 # -------------------- HOME --------------------
 @app.route("/")
@@ -39,8 +55,8 @@ def tds1():
         file2.save(file2_path)
 
         try:
-            message = process_tds1(file1_path, file2_path, UPLOAD_FOLDER)
-            return render_template("result.html", message=message, success=True)
+            output_file = process_tds1(file1_path, file2_path, UPLOAD_FOLDER)
+            return send_and_cleanup(output_file)
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -62,8 +78,8 @@ def tds2():
         file2.save(file2_path)
 
         try:
-            message = process_tds(file1_path, file2_path, UPLOAD_FOLDER)
-            return render_template("result.html", message=message, success=True)
+            output_file = process_tds(file1_path, file2_path, UPLOAD_FOLDER)
+            return send_and_cleanup(output_file)
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -85,8 +101,8 @@ def tds3():
         file2.save(file2_path)
 
         try:
-            message = process_tds3(file1_path, file2_path)
-            return render_template("result.html", message=message, success=True)
+            output_file = process_tds3(file1_path, file2_path)
+            return send_and_cleanup(output_file)
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -105,8 +121,8 @@ def duplicate():
         file.save(file_path)
 
         try:
-            message = process_duplicate(file_path, UPLOAD_FOLDER)
-            return render_template("result.html", message=message, success=True)
+            output_file = process_duplicate(file_path, UPLOAD_FOLDER)
+            return send_and_cleanup(output_file)
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -128,8 +144,8 @@ def nis():
         audit_file.save(audit_path)
 
         try:
-            message = process_nis(nis_path, audit_path)
-            return render_template("result.html", message=message, success=True)
+            output_file = process_nis(nis_path, audit_path)
+            return send_and_cleanup(output_file)
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -155,8 +171,8 @@ def retention():
         retention_file.save(retention_path)
 
         try:
-            message = process_retention(invoice_path, vendor_path, retention_path)
-            return render_template("result.html", message=message, success=True)
+            output_file = process_retention(invoice_path, vendor_path, retention_path)
+            return send_and_cleanup(output_file)
         except Exception as e:
             return render_template("result.html", message=f"❌ Error: {e}", success=False)
 
@@ -181,10 +197,15 @@ def tds_dynamic():
 
         try:
             outputs = run_tds_rules(file_path, rules)
+
+            # If multiple files → download first one (or zip later)
+            if isinstance(outputs, list) and outputs:
+                return send_and_cleanup(outputs[0])
+
             return render_template(
                 "tds_dynamic.html",
-                message=f"✅ Generated files: {', '.join(outputs)}",
-                success=True,
+                message="⚠️ No output file generated",
+                success=False,
             )
         except Exception as e:
             return render_template(
@@ -198,25 +219,23 @@ def tds_dynamic():
 # -------------------- GST ITC --------------------
 @app.route("/gst", methods=["GET", "POST"])
 def gst_itc():
-    message = ""
-
     if request.method == "POST":
         file = request.files.get("file")
 
         if not file:
-            message = "❌ Please upload an Excel file"
-        else:
-            file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-            file.save(file_path)
+            return render_template("gst_itc.html", message="❌ Please upload an Excel file")
 
-            success, result = process_gst(file_path)
-            message = (
-                f"✅ GST ITC completed. File saved: <b>{result}</b>"
-                if success
-                else f"❌ Error: {result}"
-            )
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(file_path)
 
-    return render_template("gst_itc.html", message=message)
+        success, result = process_gst(file_path)
+
+        if success:
+            return send_and_cleanup(result)
+
+        return render_template("gst_itc.html", message=f"❌ Error: {result}")
+
+    return render_template("gst_itc.html")
 
 # -------------------- RAILWAY ENTRY POINT --------------------
 if __name__ == "__main__":
