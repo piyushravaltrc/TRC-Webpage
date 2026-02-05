@@ -10,6 +10,7 @@ def write_log(message):
     with open(log_file, "a", encoding="utf-8") as f:
         f.write(f"{datetime.now():%Y-%m-%d %H:%M:%S} | {message}\n")
 
+
 # ==============================
 # GST CONFIG
 # ==============================
@@ -28,13 +29,30 @@ EXCLUDE_VENDOR = [
     "fp eco energy", "nandan terry", "municipal commissioner"
 ]
 
+
 # ==============================
 # MAIN GST FUNCTION
 # ==============================
-# def process_gst(file_path):
 def process_gst(file_path, output_folder):
     try:
+        if not file_path.endswith((".xlsx", ".xls")):
+            raise Exception("Invalid file format. Please upload Excel file")
+
         df = pd.read_excel(file_path)
+
+        if df.empty:
+            raise Exception("Uploaded file is empty")
+
+        required_cols = [
+            "PO Short Text",
+            "Vendor Name",
+            "Tax Code _I",
+            "Tax Code _P"
+        ]
+
+        for col in required_cols:
+            if col not in df.columns:
+                raise Exception(f"Missing required column: {col}")
 
         df["PO_TEXT_LC"] = df["PO Short Text"].astype(str).str.lower()
         df["VENDOR_LC"] = df["Vendor Name"].astype(str).str.lower()
@@ -50,10 +68,15 @@ def process_gst(file_path, output_folder):
 
         df["KEYWORD_MATCH"] = df["PO_TEXT_LC"].apply(keyword_match)
         df["EXCLUDE_MATCH"] = df.apply(
-            lambda x: exclude_match(x["PO_TEXT_LC"], x["VENDOR_LC"]), axis=1
+            lambda x: exclude_match(x["PO_TEXT_LC"], x["VENDOR_LC"]),
+            axis=1
         )
 
-        ineligible, eligible_not_taken, others, deviation, excluded = [], [], [], [], []
+        ineligible = []
+        eligible_not_taken = []
+        others = []
+        deviation = []
+        excluded = []
 
         for _, row in df.iterrows():
             if row["EXCLUDE_MATCH"]:
@@ -74,11 +97,11 @@ def process_gst(file_path, output_folder):
                 others.append(row)
 
         os.makedirs(output_folder, exist_ok=True)
+
         output_file = os.path.join(
             output_folder,
             f"GST_ITC_Output_{datetime.now():%d-%m-%Y_%H-%M}.xlsx"
         )
-
 
         with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
             pd.DataFrame(ineligible).to_excel(writer, "Ineligible ITC Taken", index=False)
@@ -87,12 +110,10 @@ def process_gst(file_path, output_folder):
             pd.DataFrame(deviation).to_excel(writer, "Deviation", index=False)
             pd.DataFrame(excluded).to_excel(writer, "Excluded", index=False)
 
-        write_log(f"GST ITC processed: {output_file}")
+        write_log(f"GST ITC processed successfully: {output_file}")
 
-        # return True, os.path.basename(output_file)
         return output_file
 
     except Exception as e:
-        write_log(f"Error: {e}")
-        # return False, str(e)
+        write_log(f"GST ITC Error: {e}")
         raise Exception(str(e))

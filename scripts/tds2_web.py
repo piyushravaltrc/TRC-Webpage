@@ -2,9 +2,20 @@ import pandas as pd
 import os
 from datetime import datetime
 
+LOG_FILE = "tds2_log.txt"
 
-def process_tds1(zfi071_file, zfitdsrep_file, output_folder):
+
+def write_log(message):
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(f"{datetime.now():%Y-%m-%d %H:%M:%S} | {message}\n")
+
+
+def process_tds2(zfi071_file, zfitdsrep_file, output_folder):
     try:
+        write_log("TDS2 process started")
+        write_log(f"ZFI071 File: {zfi071_file}")
+        write_log(f"ZFITDSREP File: {zfitdsrep_file}")
+
         zfi071_df = pd.read_excel(zfi071_file)
         zfitdsrep_df = pd.read_excel(zfitdsrep_file)
 
@@ -34,28 +45,30 @@ def process_tds1(zfi071_file, zfitdsrep_file, output_folder):
             how="left"
         )
 
-        filtered_df = merged_df[
+        df = merged_df[
             merged_df["PO No._x"].notna() &
             (merged_df["PO No._x"].astype(str).str.strip() != "")
         ]
 
-        tds_counts = filtered_df.groupby("PO No._x")["TDS Rate"].nunique()
-        po_multiple_tds = tds_counts[tds_counts > 1].index
-
-        df_multiple_tds = filtered_df[
-            filtered_df["PO No._x"].isin(po_multiple_tds)
-        ]
+        df = df[df["TDS Section"] == "194C"]
+        df = df[~df["Pan No"].astype(str).str[3].isin(["P", "H"])]
+        df = df[df["TDS Rate"] < 2]
 
         os.makedirs(output_folder, exist_ok=True)
 
         output_file = os.path.join(
             output_folder,
-            f"Final_Output_TDS1_{datetime.now():%d-%m-%Y_%H-%M}.xlsx"
+            f"Final_Output_TDS2_{datetime.now():%d-%m-%Y_%H-%M}.xlsx"
         )
 
-        df_multiple_tds.to_excel(output_file, index=False)
+        df.to_excel(output_file, index=False)
+
+        write_log(f"Rows identified: {df.shape[0]}")
+        write_log(f"Output file created: {output_file}")
+        write_log("TDS2 process completed successfully")
 
         return output_file
 
     except Exception as e:
+        write_log(f"ERROR: {str(e)}")
         raise Exception(str(e))
