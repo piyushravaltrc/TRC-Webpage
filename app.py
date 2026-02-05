@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, send_file, after_this_request
 
-from scripts.tds2_web import process2_tds
+from scripts.tds2_web import process_tds2
 from scripts.tds1_web import process_tds1
 from scripts.tds3_web import process_tds3
 from scripts.duplicate_finder import process_duplicate
@@ -82,7 +82,7 @@ def tds2():
         f2.save(p2)
 
         try:
-            result = process_tds(p1, p2, UPLOAD_FOLDER)
+            result = process_tds2(p1, p2, UPLOAD_FOLDER)
             return send_and_cleanup(result) if is_file_path(result) else render_template(
                 "result.html", success=True, message=result
             )
