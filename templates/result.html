@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -87,5 +87,128 @@
             <a href="/">🏠 Home</a>
         </div>
     </div>
+</body>
+</html>
+ -->
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Process Result | TRC Automation Portal</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: #f2f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .result-card {
+            background: #ffffff;
+            width: 70%;
+            max-width: 900px;
+            padding: 50px 40px;
+            border-radius: 18px;
+            text-align: center;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            color: #118a35;
+        }
+
+        .error {
+            color: #c62828;
+        }
+
+        h1 {
+            margin: 10px 0 25px;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .message {
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.6;
+            word-break: break-all;
+            margin-bottom: 35px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 26px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back {
+            background: #0d6efd;
+            color: #ffffff;
+        }
+
+        .btn-home {
+            background: #0d6efd;
+            color: #ffffff;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="result-card">
+
+    {% if success %}
+        <div class="icon success">✅ ✅</div>
+        <h1 class="success">Process Completed Successfully!</h1>
+        <div class="message success">
+            {{ message | safe }}
+        </div>
+    {% else %}
+        <div class="icon error">❌</div>
+        <h1 class="error">Process Failed</h1>
+        <div class="message error">
+            {{ message | safe }}
+        </div>
+    {% endif %}
+
+    <div class="btn-group">
+        <a href="javascript:history.back()" class="btn btn-back">
+            ← Back
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-home">
+            🏠 Home
+        </a>
+    </div>
+
+</div>
+
 </body>
 </html>

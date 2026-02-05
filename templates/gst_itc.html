@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GST Automation | TRC Automation Portal</title>
+  <title>GST ITC Analyzer | TRC Automation Portal</title>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='CA logo.png') }}">
@@ -41,6 +41,7 @@
       color: white;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 12px 25px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
@@ -49,6 +50,11 @@
       height: 55px;
       margin-right: 15px;
       border-radius: 6px;
+    }
+
+    header .logo-section {
+      display: flex;
+      align-items: center;
     }
 
     header h1 {
@@ -82,10 +88,10 @@
       font-weight: 600;
       color: var(--text-dark);
       border-left: 4px solid transparent;
+      text-decoration: none;
+      cursor: pointer;
       background: none;
       border: none;
-      cursor: pointer;
-      text-decoration: none;
       transition: 0.25s;
     }
 
@@ -117,7 +123,7 @@
       border-radius: 12px;
       padding: 25px 70px;
       width: 100%;
-      max-width: 480px;
+      max-width: 450px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     }
 
@@ -143,6 +149,7 @@
       border: 1px solid #ccc;
       background: #f9fafc;
       margin-bottom: 20px;
+      font-size: 15px;
     }
 
     button {
@@ -162,8 +169,17 @@
       transform: scale(1.03);
     }
 
-    .error { text-align: center; color: red; font-weight: 700; }
-    .success { text-align: center; color: green; font-weight: 700; }
+    .error {
+      text-align: center;
+      color: red;
+      font-weight: 700;
+    }
+
+    .success {
+      text-align: center;
+      color: green;
+      font-weight: 700;
+    }
   </style>
 </head>
 
@@ -171,8 +187,10 @@
 
 <!-- HEADER -->
 <header>
-  <img src="{{ url_for('static', filename='T R Chadha Logo.jpg') }}">
-  <h1><i class="fa-solid fa-robot"></i> Script Automation Portal</h1>
+  <div class="logo-section">
+    <img src="{{ url_for('static', filename='T R Chadha Logo.jpg') }}">
+    <h1><i class="fa-solid fa-robot"></i> Script Automation Portal</h1>
+  </div>
 </header>
 
 <div class="container">
@@ -180,19 +198,36 @@
   <!-- SIDEBAR -->
   <nav class="sidebar">
     <ul>
+
       <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
 
       <li>
-        <button class="dropdown-btn"><i class="fa-solid fa-gears"></i> Automated Scripts ▾</button>
+        <button class="dropdown-btn">
+          <i class="fa-solid fa-gears"></i> Automated Scripts ▾
+        </button>
+
         <div class="dropdown-content">
-          <a href="/tds"><i class="fa-solid fa-file-invoice-dollar"></i> TDS Scripts</a>
-          <a href="/gst"><i class="fa-solid fa-receipt"></i> GST Scripts</a>
-          <a href="/duplicate"><i class="fa-solid fa-clone"></i> Duplicate Invoice</a>
-          <a href="/retention"><i class="fa-solid fa-briefcase"></i> Retention Check</a>
+
+          <button class="dropdown-btn">
+            <i class="fa-solid fa-file-invoice-dollar"></i> TDS Scripts ▾
+          </button>
+
+          <div class="dropdown-content">
+            <a href="/tds1"><i class="fa-solid fa-book"></i> Multiple rate in single PO</a>
+            <a href="/tds2"><i class="fa-solid fa-book"></i> 194C Deducted at lower rate</a>
+            <a href="/tds3"><i class="fa-solid fa-book"></i> 194J Deducted at lower rate</a>
+            <a href="/tds_deduction_calculation"><i class="fa-solid fa-book"></i> TDS Deduction Calculation</a>
+          </div>
+
+          <a href="/duplicate"><i class="fa-solid fa-clone"></i> Duplicate Invoice Booking</a>
+          <a href="/retention"><i class="fa-solid fa-briefcase"></i> Retention Not as per PO</a>
+          <a href="/gst_itc"><i class="fa-solid fa-file-lines"></i> GST ITC Eligible/In-eligible availed</a>
+
         </div>
       </li>
 
       <li><a href="#"><i class="fa-solid fa-user"></i> User Profile</a></li>
+
     </ul>
   </nav>
 
@@ -200,7 +235,10 @@
   <main class="main-content">
 
     <div class="form-box">
-      <h2><i class="fa-solid fa-receipt"></i> GST Automation</h2>
+      <h2>
+        <i class="fa-solid fa-file-invoice" style="color:#002147"></i>
+        GST ITC Analyzer
+      </h2>
 
       {% if error %}
         <p class="error">{{ error }}</p>
@@ -210,16 +248,10 @@
         <p class="success">{{ message|safe }}</p>
       {% endif %}
 
-      <form action="/gst" method="post" enctype="multipart/form-data">
+      <form method="POST" enctype="multipart/form-data">
 
-        <label>Upload Purchase Register:</label>
-        <input type="file" name="purchase" required>
-
-        <label>Upload GSTR-2B File:</label>
-        <input type="file" name="gstr2b" required>
-
-        <label>Upload Vendor Master:</label>
-        <input type="file" name="vendor" required>
+        <label>Upload GST ITC Excel File:</label>
+        <input type="file" name="gst_file" required>
 
         <div style="text-align:center;">
           <button type="submit">

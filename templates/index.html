@@ -243,13 +243,6 @@
                 <a href="/tds1"><i class="fa-solid fa-book"></i> Multiple rate in single PO</a>
                 <button class="info-btn" data-description="➤ This script finds multiple TDS rates Used in a single PO.<br><br>
                           <b>Field required in Dump:</b><br>
-                          <b>➤ Purchase Register – Required Fields:</b><br>
-                              • Company Code<br>
-                              • Vendor<br>
-                              • Document No.<br>
-                              • PO No.<br>
-                              • Item Text<br><br>
-
                               <b>➤ TDS Report – Required Fields:</b><br>
                               • Company Code<br>
                               • Vendor<br>
@@ -270,13 +263,6 @@
                         data-description='
                           ➤ Checks invoices where TDS @194C was deducted at a lower rate excluding Individual & HUF.<br><br>
                           <b>Field required in Dump:</b><br>
-                          <b>➤ Purchase Register – Required Fields:</b><br>
-                                • Company Code<br>
-                                • Vendor<br>
-                                • Document No.<br>
-                                • PO No.<br>
-                                • Item Text<br><br>
-
                                 <b>➤ TDS Report – Required Fields:</b><br>
                                 • Company Code<br>
                                 • Vendor<br>
@@ -296,13 +282,6 @@
                 <a href="/tds3"><i class="fa-solid fa-book"></i> 194J Deducted at lower rate</a>
                 <button class="info-btn" data-description="➤ Checks invoices where TDS @194J has been deducted at a lower rate.<br><br>
                           <b>Field required in Dump:</b><br>
-                          <b>➤ Purchase Register – Required Fields:</b><br>
-                                • Company Code<br>
-                                • Vendor<br>
-                                • Document No.<br>
-                                • PO No.<br>
-                                • Item Text<br><br>
-
                                 <b>➤ TDS Report – Required Fields:</b><br>
                                 • Company Code<br>
                                 • Vendor<br>
@@ -317,7 +296,9 @@
                 </button>
               </div>
               <div class="script-item">
-                <a href="/tds_dynamic"><i class="fa-solid fa-book"></i> TDS Overall limit</a>
+                <a href="/tds_deduction_calculation">
+        <i class="fa-solid fa-book"></i> TDS Deduction Calculation
+      </a>
                 <button class="info-btn" data-description="➤ C194C – Overall: Vendor-wise cumulative > ₹1,00,000 → Report <br>
                   ➤ 194C – Individual: Document-wise > ₹30,000 → Report <br>
                   ➤ 194H – Individual: Document-wise > ₹20,000 → Report<br>
@@ -386,6 +367,13 @@
                 <span class="tooltip-box"></span>
               </button>
             </div>
+            <div class="script-item">
+              <a href="/gst_itc"><i class="fa-solid fa-file-lines"></i> GST ITC Eligible/In-eligible availed</a>
+              <button class="info-btn" data-description="➤ GST – Eligible not availed/In-eligible availed/Tax code changed by ABEX">
+                <span class="info-circle">i</span>
+                <span class="tooltip-box"></span>
+              </button>
+            </div>
             <!-- div class="script-item">
               <a href="/nis"><i class="fa-solid fa-clone"></i>NIS Data Processing</a>
               <button class="info-btn" data-description="➤ Identifies duplicate invoices of same Vendor accounted by Company.<br><br>
@@ -408,6 +396,7 @@
         </li> -->
 
         <li><a href="#"><i class="fa-solid fa-user"></i> User Profile</a></li>
+
 
       </ul>
     </nav>
