@@ -1,5 +1,10 @@
 import os
-from flask import Flask, render_template, request, send_file, after_this_request
+from flask import (
+    Flask,
+    render_template,
+    request,
+    send_file
+)
 
 from scripts.tds2_web import process_tds2
 from scripts.tds1_web import process_tds1
@@ -16,32 +21,55 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
+# -------------------------------------------------
+# Helper: check file path
+# -------------------------------------------------
 def is_file_path(value):
     return isinstance(value, str) and os.path.exists(value)
 
 
-def send_and_cleanup(file_path):
-    @after_this_request
-    def cleanup(response):
-        try:
-            if os.path.exists(file_path):
-                os.remove(file_path)
-        except Exception:
-            pass
-        return response
+# -------------------------------------------------
+# Helper: success page + auto download
+# -------------------------------------------------
+def success_page(file_path, label="File"):
+    filename = os.path.basename(file_path)
 
-    return send_file(
-        file_path,
-        as_attachment=True,
-        download_name=os.path.basename(file_path),
+    return render_template(
+        "result.html",
+        success=True,
+        message=f"""
+        📁 <b>{label} generated successfully!</b><br><br>
+        {filename}
+
+        <script>
+            window.onload = function() {{
+                window.location.href = "/download/{filename}";
+            }};
+        </script>
+        """
     )
 
 
+# -------------------------------------------------
+# Download route
+# -------------------------------------------------
+@app.route("/download/<filename>")
+def download(filename):
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    return send_file(file_path, as_attachment=True)
+
+
+# -------------------------------------------------
+# Home
+# -------------------------------------------------
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
+# -------------------------------------------------
+# TDS 1
+# -------------------------------------------------
 @app.route("/tds1", methods=["GET", "POST"])
 def tds1():
     if request.method == "POST":
@@ -58,15 +86,16 @@ def tds1():
 
         try:
             result = process_tds1(p1, p2, UPLOAD_FOLDER)
-            return send_and_cleanup(result) if is_file_path(result) else render_template(
-                "result.html", success=True, message=result
-            )
+            return success_page(result, "TDS1 Output")
         except Exception as e:
             return render_template("result.html", success=False, message=f"❌ {e}")
 
     return render_template("tds1.html")
 
 
+# -------------------------------------------------
+# TDS 2
+# -------------------------------------------------
 @app.route("/tds2", methods=["GET", "POST"])
 def tds2():
     if request.method == "POST":
@@ -83,15 +112,16 @@ def tds2():
 
         try:
             result = process_tds2(p1, p2, UPLOAD_FOLDER)
-            return send_and_cleanup(result) if is_file_path(result) else render_template(
-                "result.html", success=True, message=result
-            )
+            return success_page(result, "TDS2 Output")
         except Exception as e:
             return render_template("result.html", success=False, message=f"❌ {e}")
 
     return render_template("tds2.html")
 
 
+# -------------------------------------------------
+# TDS 3
+# -------------------------------------------------
 @app.route("/tds3", methods=["GET", "POST"])
 def tds3():
     if request.method == "POST":
@@ -108,15 +138,16 @@ def tds3():
 
         try:
             result = process_tds3(p1, p2, UPLOAD_FOLDER)
-            return send_and_cleanup(result) if is_file_path(result) else render_template(
-                "result.html", success=True, message=result
-            )
+            return success_page(result, "TDS3 Output")
         except Exception as e:
             return render_template("result.html", success=False, message=f"❌ {e}")
 
     return render_template("tds3.html")
 
 
+# -------------------------------------------------
+# Duplicate Finder
+# -------------------------------------------------
 @app.route("/duplicate", methods=["GET", "POST"])
 def duplicate():
     if request.method == "POST":
@@ -130,15 +161,16 @@ def duplicate():
 
         try:
             result = process_duplicate(path, UPLOAD_FOLDER)
-            return send_and_cleanup(result) if is_file_path(result) else render_template(
-                "result.html", success=True, message=result
-            )
+            return success_page(result, "Duplicates File")
         except Exception as e:
             return render_template("result.html", success=False, message=f"❌ {e}")
 
     return render_template("duplicate.html")
 
 
+# -------------------------------------------------
+# NIS
+# -------------------------------------------------
 @app.route("/nis", methods=["GET", "POST"])
 def nis():
     if request.method == "POST":
@@ -155,15 +187,16 @@ def nis():
 
         try:
             result = process_nis(np, ap, UPLOAD_FOLDER)
-            return send_and_cleanup(result) if is_file_path(result) else render_template(
-                "result.html", success=True, message=result
-            )
+            return success_page(result, "NIS Output")
         except Exception as e:
             return render_template("result.html", success=False, message=f"❌ {e}")
 
     return render_template("NIS.html")
 
 
+# -------------------------------------------------
+# Retention
+# -------------------------------------------------
 @app.route("/retention", methods=["GET", "POST"])
 def retention():
     if request.method == "POST":
@@ -184,15 +217,16 @@ def retention():
 
         try:
             result = process_retention(ip, vp, rp, UPLOAD_FOLDER)
-            return send_and_cleanup(result) if is_file_path(result) else render_template(
-                "result.html", success=True, message=result
-            )
+            return success_page(result, "Retention Output")
         except Exception as e:
             return render_template("result.html", success=False, message=f"❌ {e}")
 
     return render_template("Retention.html")
 
 
+# -------------------------------------------------
+# Dynamic TDS
+# -------------------------------------------------
 @app.route("/tds_dynamic", methods=["GET", "POST"])
 def tds_dynamic():
     if request.method == "POST":
@@ -211,15 +245,16 @@ def tds_dynamic():
 
         try:
             result = process_tds_deduction_calculation(path, rules, UPLOAD_FOLDER)
-            return send_and_cleanup(result) if is_file_path(result) else render_template(
-                "tds_dynamic.html", success=True, message="✅ Process completed successfully"
-            )
+            return success_page(result, "Dynamic TDS Output")
         except Exception as e:
-            return render_template("tds_dynamic.html", success=False, message=f"❌ {e}")
+            return render_template("result.html", success=False, message=f"❌ {e}")
 
     return render_template("tds_dynamic.html")
 
 
+# -------------------------------------------------
+# GST ITC
+# -------------------------------------------------
 @app.route("/gst", methods=["GET", "POST"])
 def gst_itc():
     if request.method == "POST":
@@ -233,15 +268,16 @@ def gst_itc():
 
         try:
             result = process_gst_itc(path, UPLOAD_FOLDER)
-            return send_and_cleanup(result) if is_file_path(result) else render_template(
-                "gst_itc.html", message="✅ GST processing completed"
-            )
+            return success_page(result, "GST ITC Output")
         except Exception as e:
-            return render_template("gst_itc.html", message=f"❌ {e}")
+            return render_template("result.html", success=False, message=f"❌ {e}")
 
     return render_template("gst_itc.html")
 
 
+# -------------------------------------------------
+# Entry Point
+# -------------------------------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
