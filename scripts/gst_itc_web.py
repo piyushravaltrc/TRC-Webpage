@@ -33,7 +33,7 @@ EXCLUDE_VENDOR = [
 # ==============================
 # MAIN GST FUNCTION
 # ==============================
-def process_gst(file_path, output_folder):
+def process_gst_itc(file_path, output_folder):
     try:
         if not file_path.endswith((".xlsx", ".xls")):
             raise Exception("Invalid file format. Please upload Excel file")

@@ -210,7 +210,7 @@ def tds_dynamic():
         file.save(path)
 
         try:
-            result = run_tds_rules(path, rules, UPLOAD_FOLDER)
+            result = process_tds_deduction_calculation(path, rules, UPLOAD_FOLDER)
             return send_and_cleanup(result) if is_file_path(result) else render_template(
                 "tds_dynamic.html", success=True, message="✅ Process completed successfully"
             )
@@ -232,7 +232,7 @@ def gst_itc():
         file.save(path)
 
         try:
-            result = process_gst(path, UPLOAD_FOLDER)
+            result = process_gst_itc(path, UPLOAD_FOLDER)
             return send_and_cleanup(result) if is_file_path(result) else render_template(
                 "gst_itc.html", message="✅ GST processing completed"
             )

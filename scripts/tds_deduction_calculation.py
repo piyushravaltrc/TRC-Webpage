@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 
-def run_tds_rules(uploaded_file_path, selected_rules, output_folder):
+def process_tds_deduction_calculation(uploaded_file_path, selected_rules, output_folder):
     try:
         os.makedirs(output_folder, exist_ok=True)
 
